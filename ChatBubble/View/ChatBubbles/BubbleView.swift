@@ -22,17 +22,15 @@ class BubbleView: UITextView {
     init(messageType: MessageType, frame: CGRect = .zero, textContainer: NSTextContainer? = nil) {
         super.init(frame: frame, textContainer: textContainer)
         self.font = UIFont.defaultFont
-        self.textColor = UIColor.white
+        self.textColor = UIColor.black
         self.isScrollEnabled = false
         self.isEditable = false
         self.layer.borderColor = UIColor.clear.cgColor
         
         switch messageType {
         case .received:
-            bubble.image = UIImage.receivedBubbleImage
             self.textContainerInset = UIEdgeInsets.receivedTextInsets
         case .sent:
-            bubble.image = UIImage.sentBubbleImage
             self.textContainerInset = UIEdgeInsets.sentTextInsets
         }
         
@@ -51,13 +49,6 @@ fileprivate extension UIFont {
 }
 
 fileprivate extension UIEdgeInsets {
-    static let sentTextInsets = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 21)
-    static let receivedTextInsets = UIEdgeInsets(top: 15, left: 21, bottom: 15, right: 15)
+    static let sentTextInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+    static let receivedTextInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
 }
-
-fileprivate extension UIImage {
-    static let sentBubbleImage = UIImage(named: "right_bubble")?.resizeForBubble()
-    static let receivedBubbleImage = UIImage(named: "left_bubble")?.resizeForBubble()
-    
-}
-

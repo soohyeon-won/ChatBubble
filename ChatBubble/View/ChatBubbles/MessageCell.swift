@@ -13,13 +13,14 @@ class MessageCell: UITableViewCell {
     // max text size
     private var maxTextSize: CGSize {
         // Cell's width can take up to 3/4 of screen
-        let maxWidth = self.bounds.width * 0.75
+        let maxWidth = self.bounds.width * 0.8
         let maxHeight = CGFloat.greatestFiniteMagnitude
         return CGSize(width: maxWidth, height: maxHeight)
     }
     
     private let sentTextView = BubbleView(messageType: .sent)
     private let receivedTextView = BubbleView(messageType: .received)
+    private let nameLabel = UILabel()
     private let sentTimeLabel = UILabel()
     private let receivedTimeLabel = UILabel()
 
@@ -30,6 +31,7 @@ class MessageCell: UITableViewCell {
         receivedTimeLabel.font = UIFont.time
         self.contentView.addSubview(sentTimeLabel)
         self.contentView.addSubview(receivedTimeLabel)
+        self.contentView.addSubview(nameLabel)
 
         self.contentView.addSubview(sentTextView)
         self.contentView.addSubview(receivedTextView)
@@ -50,21 +52,23 @@ class MessageCell: UITableViewCell {
                 
         switch message.messageType {
         case .sent:
-            return adjustSize(in: sentTextView, in: sentTimeLabel, with: message)
+            return adjustSize(in: sentTextView, in: sentTimeLabel, in: nameLabel, with: message)
         case .received:
-            return adjustSize(in: receivedTextView, in: receivedTimeLabel, with: message)
+            return adjustSize(in: receivedTextView, in: receivedTimeLabel, in: nameLabel, with: message)
         }
         
     }
     
     // MARK: Update Size/Position
-    
-    private func adjustSize(in textView: BubbleView, in timeLabel: UILabel, with message: Message) -> CGSize {
-        
+    // 버블뷰 자체 UI 적용
+    private func adjustSize(in textView: BubbleView, in timeLabel: UILabel, in nameLabel: UILabel, with message: Message) -> CGSize {
         // time
         timeLabel.text = message.time
         timeLabel.sizeToFit()
-
+        
+        nameLabel.text = "사람이름"
+        nameLabel.sizeToFit()
+        
         var cellSize = CGSize.zero
         textView.text = message.content
         cellSize = textView.sizeThatFits(maxTextSize)
@@ -72,11 +76,14 @@ class MessageCell: UITableViewCell {
             cellSize.height = CGFloat.minimumHeight
         }
         textView.bounds.size = cellSize
-        updateLayout(in: textView, in: timeLabel, type: message.messageType)
+        textView.backgroundColor = UIColor.red
+        textView.layer.cornerRadius = 6.0
+        updateLayout(in: textView, in: timeLabel, in: nameLabel, type: message.messageType)
         return cellSize
     }
     
-    private func updateLayout(in textView: BubbleView, in timeLabel: UILabel, type: MessageType) {
+    // bubbleView, timeLabel 위치 설정
+    private func updateLayout(in textView: BubbleView, in timeLabel: UILabel, in nameLabel: UILabel, type: MessageType) {
         
         // Handle the postion of the bubbles
         let halfTextViewWidth = textView.bounds.width / 2.0
@@ -84,9 +91,11 @@ class MessageCell: UITableViewCell {
 
         // calculate offset
         let leftCenterX = halfTextViewWidth + CGFloat.padding
+        let nameLabelHeight = nameLabel.frame.height + 4
         
         // set position of the bubbles
-        textView.center.y = halfTextViewHeight
+        textView.center.y = halfTextViewHeight + nameLabelHeight
+
         textView.center.x = (type == .received) ? leftCenterX : self.bounds.width - leftCenterX
         
         // Handle the position of the time labels
@@ -95,15 +104,18 @@ class MessageCell: UITableViewCell {
         let timeLblWidth = timeLabel.bounds.width
         let timeLblHeight = timeLabel.bounds.height
         
+        
         if type == .received {
             // time lable should appear after text view
             timeLabel.frame.origin.x = timeLblOffset
+            nameLabel.frame.origin.x = 8
         } else {
             // time lable should appear before text view
             timeLabel.frame.origin.x = self.bounds.width - timeLblOffset - timeLblWidth
+            nameLabel.frame.origin.x = self.bounds.width - 16 - nameLabel.bounds.width
         }
-        timeLabel.frame.origin.y = textView.bounds.height - timeLblHeight - CGFloat.padding
-
+        timeLabel.frame.origin.y = textView.bounds.height - timeLblHeight - CGFloat.padding + nameLabelHeight
+        nameLabel.frame.origin.y = 0
     }
 
 }
